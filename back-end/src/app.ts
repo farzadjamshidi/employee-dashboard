@@ -1,11 +1,21 @@
 import bodyParser from "body-parser";
 import express from "express";
-import appRouter from "./routes/app.route";
+import employeeRouter from "./routes/employee.route";
+import shiftRouter from "./routes/shift.route";
 
 const app = express();
 
 app.use(bodyParser.json());
 
-app.use(appRouter);
+app.use((req, res, next) =>
+{
+    setTimeout(() =>
+    {
+        next();
+    }, 500);
+});
+
+app.use(employeeRouter);
+app.use(shiftRouter);
 
 app.listen(8000);
