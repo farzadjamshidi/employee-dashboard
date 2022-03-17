@@ -1,0 +1,33 @@
+.m-informations-container {
+  display: flex;
+}
+.m-each-information {
+  flex: 1;
+  padding: 10px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+.bg-purple {
+  background-color: #712d90;
+}
+.bg-light-blue {
+  background-color: #0083a9;
+}
+.bg-green {
+  background-color: #b2bc35;
+}
+.bg-yellow {
+  background-color: #edc052;
+}
+.a-information-title {
+  font-size: 12px;
+}
+.a-information-number {
+  margin-top: 15px;
+  align-self: center;
+  font-size: 30px;
+}
+.table {
+  width: 100%;
+}
