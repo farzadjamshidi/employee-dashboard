@@ -5,6 +5,7 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  title = 'employee-dashboard-front-end';
+export class AppComponent
+{
+
 }
