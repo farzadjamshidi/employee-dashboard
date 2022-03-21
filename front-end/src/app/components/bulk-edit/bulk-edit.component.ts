@@ -27,6 +27,7 @@ export class BulkEditComponent implements OnInit
 {
 
   shiftsByDate: { [key: string]: ShiftByHour[]; } = {};
+  today: Date = new Date();
 
   constructor(
     private hoursToHoursColonMinutesHerlper: HoursToHoursColonMinutesHerlper,
@@ -40,6 +41,10 @@ export class BulkEditComponent implements OnInit
 
   ngOnInit(): void
   {
+    this.data.selectedEmployees.forEach(employee =>
+    {
+      this.shiftTimeChange(this.today, employee);
+    });
   }
 
   shiftTimeChange(date: Date, employee: EmployeeInformation): void
