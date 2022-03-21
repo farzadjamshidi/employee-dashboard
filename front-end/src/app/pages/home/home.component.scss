@@ -1,5 +1,9 @@
+.o-home-page {
+  height: 100vh;
+}
 .m-informations-container {
   display: flex;
+  height: 75px;
 }
 .m-each-information {
   flex: 1;
@@ -28,6 +32,17 @@
   align-self: center;
   font-size: 30px;
 }
+.m-home-page-table {
+  height: calc(100vh - 155px);
+  overflow-y: auto;
+}
 .table {
   width: 100%;
+}
+.m-home-page-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+.a-save-button {
+  margin: 20px;
 }
