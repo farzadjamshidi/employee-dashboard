@@ -47,6 +47,19 @@ router.get('/shifts', (req, res, next) =>
     res.status(200).json(filteredShifts);
 });
 
+router.put('/shifts', (req, res, next) =>
+{
+    const updatedShifts = req.body.shifts as Shift[];
+
+    updatedShifts.forEach(updatedShift =>
+    {
+        const shiftsIndex = shifts.findIndex(shift => shift.id === updatedShift.id);
+        shifts[shiftsIndex] = updatedShift;
+    });
+
+    res.status(200).json({ message: 'Shifts updated.' });
+});
+
 const isInEqualDays = (clockIn: string, startDate: string) =>
 {
     const clockInDate = new Date(clockIn);
