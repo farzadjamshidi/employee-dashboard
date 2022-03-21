@@ -81,4 +81,17 @@ router.get('/employees', (req, res, next) =>
     res.status(200).json(employees);
 });
 
+router.put('/employees', (req, res, next) =>
+{
+    const updatedEmployees = req.body.employees as Employee[];
+
+    updatedEmployees.forEach(updatedEmployee =>
+    {
+        const employeesIndex = employees.findIndex(employee => employee.id === updatedEmployee.id);
+        employees[employeesIndex] = updatedEmployee;
+    });
+
+    res.status(200).json({ message: 'employees updated.' });
+});
+
 export default router;

@@ -1,72 +1,84 @@
-<div class="m-informations-container">
-  <div class="m-each-information bg-purple">
-    <span class="a-information-title">Total Number Of Employees</span>
-    <span class="a-information-number">{{shiftsInformation.totalEmployees}}</span>
+<div class="o-home-page">
+  <div class="m-informations-container">
+    <div class="m-each-information bg-purple">
+      <span class="a-information-title">Total Number Of Employees</span>
+      <span class="a-information-number">{{shiftsInformation.totalEmployees}}</span>
+    </div>
+    <div class="m-each-information bg-yellow">
+      <span class="a-information-title">Total Clocked In Time</span>
+      <span class="a-information-number">{{shiftsInformation.totalTimeInHours | HtoHcolonM }}</span>
+    </div>
+    <div class="m-each-information bg-green">
+      <span class="a-information-title">Total Amount Paid For Regular Hours</span>
+      <span class="a-information-number">{{shiftsInformation.totalRegularPaid | currency}}</span>
+    </div>
+    <div class="m-each-information bg-light-blue">
+      <span class="a-information-title">Total Overtime Amount Paid For Overtime Hours</span>
+      <span class="a-information-number">{{shiftsInformation.totalOvertimePaid | currency}}</span>
+    </div>
   </div>
-  <div class="m-each-information bg-yellow">
-    <span class="a-information-title">Total Clocked In Time</span>
-    <span class="a-information-number">{{shiftsInformation.totalTimeInHours | HtoHcolonM }}</span>
+
+  <div class="m-home-page-table">
+    <table mat-table [dataSource]="dataSource" class="table">
+
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="Name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+
+      <!-- Email Column -->
+      <ng-container matColumnDef="Email">
+        <th mat-header-cell *matHeaderCellDef> Email </th>
+        <td mat-cell *matCellDef="let element"> {{element.email}} </td>
+      </ng-container>
+
+      <!-- TotalClockedIn Column -->
+      <ng-container matColumnDef="TotalClockedIn">
+        <th mat-header-cell *matHeaderCellDef> Total Clocked In </th>
+        <td mat-cell *matCellDef="let element"> {{element.totalTimeInHours | HtoHcolonM}} </td>
+      </ng-container>
+
+      <!-- TotalRegularPaid Column -->
+      <ng-container matColumnDef="TotalRegularPaid">
+        <th mat-header-cell *matHeaderCellDef> Total Regular Paid </th>
+        <td mat-cell *matCellDef="let element"> {{element.totalRegularPaid | currency}} </td>
+      </ng-container>
+
+      <!-- TotalOvertimePaid Column -->
+      <ng-container matColumnDef="TotalOvertimePaid">
+        <th mat-header-cell *matHeaderCellDef> Total Overtime Paid </th>
+        <td mat-cell *matCellDef="let element"> {{element.totalOvertimePaid | currency}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+          (click)="selection.toggle(row)">
+      </tr>
+    </table>
   </div>
-  <div class="m-each-information bg-green">
-    <span class="a-information-title">Total Amount Paid For Regular Hours</span>
-    <span class="a-information-number">{{shiftsInformation.totalRegularPaid | currency}}</span>
+
+  <div class="m-home-page-buttons">
+    <button mat-raised-button color="primary" class="a-save-button"
+      [disabled]="!selection.selected.length" (click)="bulkEdit()">
+      Bulk Edit
+    </button>
   </div>
-  <div class="m-each-information bg-light-blue">
-    <span class="a-information-title">Total Overtime Amount Paid For Overtime Hours</span>
-    <span class="a-information-number">{{shiftsInformation.totalOvertimePaid | currency}}</span>
-  </div>
+
 </div>
-
-<table mat-table [dataSource]="dataSource" class="table">
-
-  <!-- Checkbox Column -->
-  <ng-container matColumnDef="select">
-    <th mat-header-cell *matHeaderCellDef>
-      <mat-checkbox (change)="$event ? masterToggle() : null"
-                    [checked]="selection.hasValue() && isAllSelected()"
-                    [indeterminate]="selection.hasValue() && !isAllSelected()">
-      </mat-checkbox>
-    </th>
-    <td mat-cell *matCellDef="let row">
-      <mat-checkbox (click)="$event.stopPropagation()"
-                    (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)">
-      </mat-checkbox>
-    </td>
-  </ng-container>
-
-  <!-- Name Column -->
-  <ng-container matColumnDef="Name">
-    <th mat-header-cell *matHeaderCellDef> Name </th>
-    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-  </ng-container>
-
-  <!-- Email Column -->
-  <ng-container matColumnDef="Email">
-    <th mat-header-cell *matHeaderCellDef> Email </th>
-    <td mat-cell *matCellDef="let element"> {{element.email}} </td>
-  </ng-container>
-
-  <!-- TotalClockedIn Column -->
-  <ng-container matColumnDef="TotalClockedIn">
-    <th mat-header-cell *matHeaderCellDef> Total Clocked In </th>
-    <td mat-cell *matCellDef="let element"> {{element.totalTimeInHours | HtoHcolonM}} </td>
-  </ng-container>
-
-  <!-- TotalRegularPaid Column -->
-  <ng-container matColumnDef="TotalRegularPaid">
-    <th mat-header-cell *matHeaderCellDef> Total Regular Paid </th>
-    <td mat-cell *matCellDef="let element"> {{element.totalRegularPaid | currency}} </td>
-  </ng-container>
-
-  <!-- TotalOvertimePaid Column -->
-  <ng-container matColumnDef="TotalOvertimePaid">
-    <th mat-header-cell *matHeaderCellDef> Total Overtime Paid </th>
-    <td mat-cell *matCellDef="let element"> {{element.totalOvertimePaid | currency}} </td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-      (click)="selection.toggle(row)">
-  </tr>
-</table>

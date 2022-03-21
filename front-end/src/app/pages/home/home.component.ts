@@ -1,8 +1,11 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { firstValueFrom } from 'rxjs';
+import { BulkEditComponent } from 'src/app/components/bulk-edit/bulk-edit.component';
 import { ShiftHelper } from 'src/app/core/helpers/shift.helper';
+import { BulkEditDataModel } from 'src/app/core/models/bulk-edit.model';
 import { Employee, EmployeeInformation } from 'src/app/core/models/employee.model';
 import { GetEmployeesRequest } from 'src/app/core/models/get-employees.model';
 import { GetShiftsRequest } from 'src/app/core/models/get-shifts.model';
@@ -11,7 +14,7 @@ import { IEmployeeRepo } from 'src/app/core/repository/interfaces/employee.inter
 import { IShiftRepo } from 'src/app/core/repository/interfaces/shift.interface';
 
 @Component({
-  selector: 'app-home',
+  selector: 'ed-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,6 +29,7 @@ export class HomeComponent implements OnInit
   loading = false;
 
   constructor(
+    private dialog: MatDialog,
     private changeDetector: ChangeDetectorRef,
     @Inject('IEmployeeRepo') private employeeRepo: IEmployeeRepo,
     @Inject('IShiftRepo') private shiftRepo: IShiftRepo,
@@ -86,6 +90,25 @@ export class HomeComponent implements OnInit
     }
 
     this.changeDetector.detectChanges();
+  }
+
+  bulkEdit(): void
+  {
+
+    const bulkEditData: BulkEditDataModel = {
+      selectedEmployees: this.selection.selected
+    };
+
+    const dialogRef = this.dialog.open(BulkEditComponent, {
+      panelClass: 'bulk-edit-dialog',
+      width: '80vw',
+      data: bulkEditData
+    });
+
+    dialogRef.afterClosed().subscribe(result =>
+    {
+
+    });
   }
 }
 

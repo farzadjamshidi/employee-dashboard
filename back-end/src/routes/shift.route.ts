@@ -26,7 +26,53 @@ for (let i = 0; i < 1100; i++)
 
 router.get('/shifts', (req, res, next) =>
 {
-    res.status(200).json(shifts);
+    const employeeId = Number(req.query.employeeId);
+    const startDate = req.query.startDate as string;
+
+    const filteredShifts = shifts.filter(shift =>
+    {
+        if (employeeId && shift.employeeId !== employeeId)
+        {
+            return false;
+        }
+
+        if (startDate && !isInEqualDays(shift.clockIn, startDate))
+        {
+            return false;
+        }
+
+        return true;
+    });
+
+    res.status(200).json(filteredShifts);
 });
+
+router.put('/shifts', (req, res, next) =>
+{
+    const updatedShifts = req.body.shifts as Shift[];
+
+    updatedShifts.forEach(updatedShift =>
+    {
+        const shiftsIndex = shifts.findIndex(shift => shift.id === updatedShift.id);
+        shifts[shiftsIndex] = updatedShift;
+    });
+
+    res.status(200).json({ message: 'Shifts updated.' });
+});
+
+const isInEqualDays = (clockIn: string, startDate: string) =>
+{
+    const clockInDate = new Date(clockIn);
+    const startDateDate = new Date(startDate);
+    if (
+        clockInDate.getDate() === startDateDate.getDate() &&
+        clockInDate.getMonth() === startDateDate.getMonth() &&
+        clockInDate.getFullYear() === startDateDate.getFullYear()
+    )
+    {
+        return true;
+    }
+    return false;
+};
 
 export default router;
