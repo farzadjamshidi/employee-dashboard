@@ -7,13 +7,8 @@ export class Employee
   overtimeHourlyRate!: number;
 }
 
-export class EmployeeInformation
+export class EmployeeInformation extends Employee
 {
-  id!: number;
-  name!: string;
-  email!: string;
-  hourlyRate!: number;
-  overtimeHourlyRate!: number;
   totalTimeInHours!: number; // ETTS
   totalRegularPaid !: number; // ETRP
   totalOvertimePaid!: number; // ETOP
