@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { firstValueFrom } from 'rxjs';
 import { HoursToHoursColonMinutesHerlper } from 'src/app/core/helpers/hours-to-hours-colon-minutes-pipe/hours-to-hours-colon-minutes.helper';
 import { BulkEditDataModel } from 'src/app/core/models/bulk-edit.model';
 import { EmployeeInformation } from 'src/app/core/models/employee.model';
@@ -30,6 +32,7 @@ export class BulkEditComponent implements OnInit
   today: Date = new Date();
 
   constructor(
+    private snackBar: MatSnackBar,
     private hoursToHoursColonMinutesHerlper: HoursToHoursColonMinutesHerlper,
     private changeDetector: ChangeDetectorRef,
     @Inject('IShiftRepo') private shiftRepo: IShiftRepo,
@@ -80,40 +83,38 @@ export class BulkEditComponent implements OnInit
 
   changeClockInTime(clockInHHColonMM: string, shift: ShiftByHour): void
   {
-    const clockInHour = Number(clockInHHColonMM.split(':')[0]);
-    const clockInMinute = Number(clockInHHColonMM.split(':')[1]);
+    const [clockInHour, clockInMinute] = this.getHourAndMinute(clockInHHColonMM);
 
     if ((!clockInHour && clockInHour !== 0) || (!clockInMinute && clockInMinute !== 0))
       return;
 
-    const newClockIn = new Date(new Date(new Date(shift.clockIn).setUTCHours(clockInHour, clockInMinute))
-      .setDate(new Date(shift.clockIn).getDate())).toISOString().replace('Z', '');
+    const newClockIn = this.setHourAndMinute(shift.clockIn, clockInHour, clockInMinute);
 
-    const totalTime = (new Date(shift.clockOut).getTime() - new Date(newClockIn).getTime()) / (1000 * 60 * 60);
-    const totalTimeHHColonMM = this.hoursToHoursColonMinutesHerlper.transform(totalTime);
-
-    this.shiftsByDate[shift.employeeId].find(s => s.id === shift.id)!.totalTimeHHColonMM = totalTimeHHColonMM;
-
-  }
-
-  changeClockOutTime(clockOutHHColonMM: string, shift: ShiftByHour): void
-  {
-    const clockOutHour = Number(clockOutHHColonMM.split(':')[0]);
-    const clockOutMinute = Number(clockOutHHColonMM.split(':')[1]);
-
-    if ((!clockOutHour && clockOutHour !== 0) || (!clockOutMinute && clockOutMinute !== 0))
-      return;
-
-    const newClockOut = new Date(new Date(new Date(shift.clockOut).setUTCHours(clockOutHour, clockOutMinute))
-      .setDate(new Date(shift.clockOut).getDate())).toISOString().replace('Z', '');
-
-    const totalTime = (new Date(newClockOut).getTime() - new Date(shift.clockIn).getTime()) / (1000 * 60 * 60);
-    const totalTimeHHColonMM = this.hoursToHoursColonMinutesHerlper.transform(totalTime);
+    const totalTimeHHColonMM = this.getTotalTimeHHColonMM(newClockIn, shift.clockOut);
 
     this.shiftsByDate[shift.employeeId].find(
       shiftByDate => shiftByDate.id === shift.id
     )!.totalTimeHHColonMM = totalTimeHHColonMM;
 
+    this.changeDetector.detectChanges();
+  }
+
+  changeClockOutTime(clockOutHHColonMM: string, shift: ShiftByHour): void
+  {
+    const [clockOutHour, clockOutMinute] = this.getHourAndMinute(clockOutHHColonMM);
+
+    if ((!clockOutHour && clockOutHour !== 0) || (!clockOutMinute && clockOutMinute !== 0))
+      return;
+
+    const newClockOut = this.setHourAndMinute(shift.clockOut, clockOutHour, clockOutMinute);
+
+    const totalTimeHHColonMM = this.getTotalTimeHHColonMM(shift.clockIn, newClockOut);
+
+    this.shiftsByDate[shift.employeeId].find(
+      shiftByDate => shiftByDate.id === shift.id
+    )!.totalTimeHHColonMM = totalTimeHHColonMM;
+
+    this.changeDetector.detectChanges();
   }
 
   cancel(): void
@@ -121,7 +122,7 @@ export class BulkEditComponent implements OnInit
     this.dialogRef.close();
   };
 
-  save(): void
+  async save(): Promise<void>
   {
     const updatedShifts: Shift[] = [];
 
@@ -130,59 +131,74 @@ export class BulkEditComponent implements OnInit
       shifts.forEach(shift =>
       {
 
-        const clockInHour = Number(shift.clockInHHColonMM.split(':')[0]);
-        const clockInMinute = Number(shift.clockInHHColonMM.split(':')[1]);
+        const [clockInHour, clockInMinute] = this.getHourAndMinute(shift.clockInHHColonMM);
 
-        const clockOutHour = Number(shift.clockOutHHColonMM.split(':')[0]);
-        const clockOutMinute = Number(shift.clockOutHHColonMM.split(':')[1]);
+        const [clockOutHour, clockOutMinute] = this.getHourAndMinute(shift.clockOutHHColonMM);
 
         updatedShifts.push({
           id: shift.id,
           employeeId: shift.employeeId,
-          clockIn: new Date(new Date(new Date(shift.clockIn).setUTCHours(clockInHour, clockInMinute))
-            .setDate(new Date(shift.clockIn).getDate())).toISOString().replace('Z', ''),
-          clockOut: new Date(new Date(new Date(shift.clockOut).setUTCHours(clockOutHour, clockOutMinute))
-            .setDate(new Date(shift.clockOut).getDate())).toISOString().replace('Z', '')
+          clockIn: this.setHourAndMinute(shift.clockIn, clockInHour, clockInMinute),
+          clockOut: this.setHourAndMinute(shift.clockOut, clockOutHour, clockOutMinute)
         });
       });
 
     });
 
-    if (updatedShifts.length)
+    try
     {
-      const shiftsRequest: PutShiftsRequest = {
-        shifts: updatedShifts
+      if (updatedShifts.length)
+      {
+        const shiftsRequest: PutShiftsRequest = {
+          shifts: updatedShifts
+        };
+
+        await firstValueFrom(this.shiftRepo.update(shiftsRequest));
+      }
+
+      const employeesRequest: PutEmployeesRequest = {
+        employees: this.data.selectedEmployees.map(employee =>
+        {
+          return {
+            id: employee.id,
+            name: employee.name,
+            email: employee.email,
+            hourlyRate: employee.hourlyRate,
+            overtimeHourlyRate: employee.overtimeHourlyRate
+          };
+        })
       };
-      this.shiftRepo.update(shiftsRequest).subscribe({
-        next: () =>
-        {
-        },
-        error: () =>
-        {
-        }
+
+      await firstValueFrom(this.employeeRepo.update(employeesRequest));
+
+      this.snackBar.open('Saved successfully.', undefined, {
+        duration: 2000
+      });
+
+    } catch (error)
+    {
+      this.snackBar.open('Save faild.', undefined, {
+        duration: 2000
       });
     }
-
-    const employeesRequest: PutEmployeesRequest = {
-      employees: this.data.selectedEmployees.map(employee =>
-      {
-        return {
-          id: employee.id,
-          name: employee.name,
-          email: employee.email,
-          hourlyRate: employee.hourlyRate,
-          overtimeHourlyRate: employee.overtimeHourlyRate
-        };
-      })
-    };
-    this.employeeRepo.update(employeesRequest).subscribe({
-      next: () =>
-      {
-      },
-      error: () =>
-      {
-      }
-    });
-
   };
+
+  getHourAndMinute(HHColonMM: string): [number, number]
+  {
+    const hour = Number(HHColonMM.split(':')[0]);
+    const minute = Number(HHColonMM.split(':')[1]);
+
+    return [hour, minute];
+  }
+
+  setHourAndMinute(date: string, newHour: number, newMinute: number): string
+  {
+    return new Date(new Date(date + '+0000').setUTCHours(newHour, newMinute)).toISOString().replace('Z', '');
+  }
+
+  getTotalTimeHHColonMM(clockIn: string, clockOut: string): string
+  {
+    const totalTime = (new Date(clockOut).getTime() - new Date(clockIn).getTime()) / (1000 * 60 * 60);
+    return this.hoursToHoursColonMinutesHerlper.transform(totalTime);
+  }
 }

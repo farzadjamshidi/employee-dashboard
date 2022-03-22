@@ -7,6 +7,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { HoursToHoursColonMinutesHerlper } from 'src/app/core/helpers/hours-to-hours-colon-minutes-pipe/hours-to-hours-colon-minutes.helper';
 import { LocalHostV0EmployeeRepo } from 'src/app/core/repository/localHost/v0/employee.repo';
 import { LocalHostV0ShiftRepo } from 'src/app/core/repository/localHost/v0/shift.repo';
@@ -23,6 +24,7 @@ const CORE_MODULES = [
 ];
 
 const MATERIAL_MODULES = [
+  MatSnackBarModule,
   MatDividerModule,
   MatButtonModule,
   MatDatepickerModule,
