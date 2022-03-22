@@ -57,7 +57,6 @@ export class BulkEditComponent implements OnInit
     this.shiftRepo.list(shiftsRequest).subscribe({
       next: (shifts) =>
       {
-        console.log(shifts);
         this.shiftsByDate[employee.id] = [];
         this.shiftsByDate[employee.id] = shifts.map(shift =>
         {
@@ -77,6 +76,44 @@ export class BulkEditComponent implements OnInit
       {
       }
     });
+  }
+
+  changeClockInTime(clockInHHColonMM: string, shift: ShiftByHour): void
+  {
+    const clockInHour = Number(clockInHHColonMM.split(':')[0]);
+    const clockInMinute = Number(clockInHHColonMM.split(':')[1]);
+
+    if ((!clockInHour && clockInHour !== 0) || (!clockInMinute && clockInMinute !== 0))
+      return;
+
+    const newClockIn = new Date(new Date(new Date(shift.clockIn).setUTCHours(clockInHour, clockInMinute))
+      .setDate(new Date(shift.clockIn).getDate())).toISOString().replace('Z', '');
+
+    const totalTime = (new Date(shift.clockOut).getTime() - new Date(newClockIn).getTime()) / (1000 * 60 * 60);
+    const totalTimeHHColonMM = this.hoursToHoursColonMinutesHerlper.transform(totalTime);
+
+    this.shiftsByDate[shift.employeeId].find(s => s.id === shift.id)!.totalTimeHHColonMM = totalTimeHHColonMM;
+
+  }
+
+  changeClockOutTime(clockOutHHColonMM: string, shift: ShiftByHour): void
+  {
+    const clockOutHour = Number(clockOutHHColonMM.split(':')[0]);
+    const clockOutMinute = Number(clockOutHHColonMM.split(':')[1]);
+
+    if ((!clockOutHour && clockOutHour !== 0) || (!clockOutMinute && clockOutMinute !== 0))
+      return;
+
+    const newClockOut = new Date(new Date(new Date(shift.clockOut).setUTCHours(clockOutHour, clockOutMinute))
+      .setDate(new Date(shift.clockOut).getDate())).toISOString().replace('Z', '');
+
+    const totalTime = (new Date(newClockOut).getTime() - new Date(shift.clockIn).getTime()) / (1000 * 60 * 60);
+    const totalTimeHHColonMM = this.hoursToHoursColonMinutesHerlper.transform(totalTime);
+
+    this.shiftsByDate[shift.employeeId].find(
+      shiftByDate => shiftByDate.id === shift.id
+    )!.totalTimeHHColonMM = totalTimeHHColonMM;
+
   }
 
   cancel(): void
@@ -102,8 +139,10 @@ export class BulkEditComponent implements OnInit
         updatedShifts.push({
           id: shift.id,
           employeeId: shift.employeeId,
-          clockIn: new Date(new Date(shift.clockIn).setUTCHours(clockInHour, clockInMinute)).toISOString().replace('Z', ''),
-          clockOut: new Date(new Date(shift.clockOut).setUTCHours(clockOutHour, clockOutMinute)).toISOString().replace('Z', '')
+          clockIn: new Date(new Date(new Date(shift.clockIn).setUTCHours(clockInHour, clockInMinute))
+            .setDate(new Date(shift.clockIn).getDate())).toISOString().replace('Z', ''),
+          clockOut: new Date(new Date(new Date(shift.clockOut).setUTCHours(clockOutHour, clockOutMinute))
+            .setDate(new Date(shift.clockOut).getDate())).toISOString().replace('Z', '')
         });
       });
 
