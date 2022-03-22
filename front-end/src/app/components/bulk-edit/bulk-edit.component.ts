@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { firstValueFrom } from 'rxjs';
 import { HoursToHoursColonMinutesHerlper } from 'src/app/core/helpers/hours-to-hours-colon-minutes-pipe/hours-to-hours-colon-minutes.helper';
 import { BulkEditDataModel } from 'src/app/core/models/bulk-edit.model';
 import { EmployeeInformation } from 'src/app/core/models/employee.model';
@@ -30,6 +32,7 @@ export class BulkEditComponent implements OnInit
   today: Date = new Date();
 
   constructor(
+    private _snackBar: MatSnackBar,
     private hoursToHoursColonMinutesHerlper: HoursToHoursColonMinutesHerlper,
     private changeDetector: ChangeDetectorRef,
     @Inject('IShiftRepo') private shiftRepo: IShiftRepo,
@@ -121,7 +124,7 @@ export class BulkEditComponent implements OnInit
     this.dialogRef.close();
   };
 
-  save(): void
+  async save(): Promise<void>
   {
     const updatedShifts: Shift[] = [];
 
@@ -148,41 +151,45 @@ export class BulkEditComponent implements OnInit
 
     });
 
-    if (updatedShifts.length)
+    try
     {
-      const shiftsRequest: PutShiftsRequest = {
-        shifts: updatedShifts
+      if (updatedShifts.length)
+      {
+        const shiftsRequest: PutShiftsRequest = {
+          shifts: updatedShifts
+        };
+
+        await firstValueFrom(this.shiftRepo.update(shiftsRequest));
+      }
+
+      const employeesRequest: PutEmployeesRequest = {
+        employees: this.data.selectedEmployees.map(employee =>
+        {
+          return {
+            id: employee.id,
+            name: employee.name,
+            email: employee.email,
+            hourlyRate: employee.hourlyRate,
+            overtimeHourlyRate: employee.overtimeHourlyRate
+          };
+        })
       };
-      this.shiftRepo.update(shiftsRequest).subscribe({
-        next: () =>
-        {
-        },
-        error: () =>
-        {
-        }
+
+      await firstValueFrom(this.employeeRepo.update(employeesRequest));
+
+      this._snackBar.open('Saved successfully.', undefined, {
+        duration: 2000
+      });
+
+
+
+    } catch (error)
+    {
+      this._snackBar.open('Save faild.', undefined, {
+        duration: 2000
       });
     }
 
-    const employeesRequest: PutEmployeesRequest = {
-      employees: this.data.selectedEmployees.map(employee =>
-      {
-        return {
-          id: employee.id,
-          name: employee.name,
-          email: employee.email,
-          hourlyRate: employee.hourlyRate,
-          overtimeHourlyRate: employee.overtimeHourlyRate
-        };
-      })
-    };
-    this.employeeRepo.update(employeesRequest).subscribe({
-      next: () =>
-      {
-      },
-      error: () =>
-      {
-      }
-    });
 
   };
 }
