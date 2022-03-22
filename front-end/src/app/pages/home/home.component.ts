@@ -102,6 +102,7 @@ export class HomeComponent implements OnInit
     const dialogRef = this.dialog.open(BulkEditComponent, {
       panelClass: 'bulk-edit-dialog',
       width: '80vw',
+      maxHeight: '80vh',
       data: bulkEditData
     });
 
