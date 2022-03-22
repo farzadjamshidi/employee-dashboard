@@ -41,7 +41,7 @@ export class BulkEditComponent implements OnInit
 
   ngOnInit(): void
   {
-    this.data.selectedEmployees.forEach(employee =>
+    this.data.selectedEmployees?.forEach(employee =>
     {
       this.shiftTimeChange(this.today, employee);
     });
