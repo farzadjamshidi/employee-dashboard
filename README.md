@@ -49,3 +49,6 @@ Change data in bulk edit dialog based on calendar.
 
 ### Task5
 Save the changes of bulk edit dialog.
+
+### Task6 (Additional Features)
+Add shared library
