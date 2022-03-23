@@ -67,6 +67,7 @@ export class HomeComponent implements OnInit
 
     try
     {
+      this.loading = true;
 
       const shiftsRequest = new GetShiftsRequest();
 
@@ -84,9 +85,11 @@ export class HomeComponent implements OnInit
 
       this.dataSource = new MatTableDataSource<EmployeeInformation>(this.employeesInformation);
 
+      this.loading = false;
+
     } catch (error)
     {
-
+      this.loading = false;
     }
 
     this.changeDetector.detectChanges();
@@ -104,11 +107,6 @@ export class HomeComponent implements OnInit
       width: '80vw',
       maxHeight: '80vh',
       data: bulkEditData
-    });
-
-    dialogRef.afterClosed().subscribe(result =>
-    {
-
     });
   }
 }
