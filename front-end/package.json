@@ -2,6 +2,8 @@
   "name": "employee-dashboard-front-end",
   "version": "0.0.0",
   "scripts": {
+    "build-lib": "ng build @ed/shared --prod",
+    "publish:local": "npm run build-lib && node ./publish-local.js",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
@@ -30,6 +32,7 @@
     "@angular/compiler-cli": "~13.2.0",
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
+    "copy-packages-locally": "^1.0.5",
     "jasmine-core": "~4.0.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",

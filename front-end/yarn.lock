@@ -2463,6 +2463,11 @@ copy-anything@^2.0.1:
   dependencies:
     is-what "^3.14.1"
 
+copy-packages-locally@^1.0.5:
+  version "1.0.5"
+  resolved "https://npm.totaleintegrated.com/copy-packages-locally/-/copy-packages-locally-1.0.5.tgz#d8a57542df55f72ac10519628e9a63aee62f7c65"
+  integrity sha512-+l/fq/zJI4rdM6Oin6oE/C4hdovBlECLatjq8cvJlVnAK/K4tZWYByndMgV4Et3QAMLjdJV2vkq/hoCoh2Zd1w==
+
 copy-webpack-plugin@10.2.1:
   version "10.2.1"
   resolved "https://npm.totaleintegrated.com/copy-webpack-plugin/-/copy-webpack-plugin-10.2.1.tgz#115a41f913070ac236a1b576066204cbf35341a1"
