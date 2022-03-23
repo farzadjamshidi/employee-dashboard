@@ -52,3 +52,4 @@ Save the changes of bulk edit dialog.
 
 ### Task6 (Additional Features)
 Add shared library
+Add loading component to shared library
