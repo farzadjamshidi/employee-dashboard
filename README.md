@@ -53,3 +53,13 @@ Save the changes of bulk edit dialog.
 ### Task6 (Additional Features)
 Add shared library
 Add loading component to shared library
+Add Docker
+
+## Development server
+
+A. With out docker
+1) Switch to back-end folder and run 'npm install' then run 'npm start' in command line
+2) Switch to front-end folder and run 'npm run publish:local' then run 'npm start' in command line
+
+B. With docker
+1) Run 'docker compose up' in command line

@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  backend:
+    build: ./back-end
+    ports:
+      - '8000:8000'
+    volumes: 
+      - ./back-end:/app
+      - /app/node_modules
+  frontend:
+    build: ./front-end
+    ports:
+      - '4200:4200'
+    volumes: 
+      - ./front-end:/app
+    stdin_open: true
+    tty: true
+    depends_on: 
+      - backend
