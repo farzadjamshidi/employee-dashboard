@@ -54,6 +54,7 @@ Save the changes of bulk edit dialog.
 Add shared library
 Add loading component to shared library
 Add Docker
+Add setting.json for lint and formatting
 
 ## Development server
 
