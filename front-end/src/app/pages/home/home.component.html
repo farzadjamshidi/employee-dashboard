@@ -1,4 +1,4 @@
-<div class="o-home-page">
+<div class="o-home-page" *ngIf="!loading">
   <div class="m-informations-container">
     <div class="m-each-information bg-purple">
       <span class="a-information-title">Total Number Of Employees</span>
@@ -82,3 +82,4 @@
   </div>
 
 </div>
+<ed-loading [show]="loading"></ed-loading>

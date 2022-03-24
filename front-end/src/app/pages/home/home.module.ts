@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
+import { LoadingModule } from '@ed/shared';
 import { BulkEditModule } from 'src/app/components/bulk-edit/bult-edit.module';
 import { HoursToHoursColonMinutesPipeModule } from 'src/app/core/helpers/hours-to-hours-colon-minutes-pipe/hours-to-hours-colon-minutes.module';
 import { LocalHostV0EmployeeRepo } from 'src/app/core/repository/localHost/v0/employee.repo';
@@ -23,6 +24,7 @@ const MATERIAL_MODULES = [
 ];
 
 const ED_MODULES = [
+  LoadingModule,
   BulkEditModule,
   HoursToHoursColonMinutesPipeModule
 ];
